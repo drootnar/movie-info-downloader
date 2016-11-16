@@ -1,6 +1,7 @@
 import pytest
 import requests
-from . import get_latest_movies, get_movies_from_rss, MovieInfoError
+import asyncio
+from . import get_latest_movies, get_movies_from_rss, download_movie, MovieInfoError
 
 
 class FakeResponse(object):
@@ -33,3 +34,16 @@ def test_get_movies_from_rss(monkeypatch):
     assert movies[2][0] == "Hobbit mkv edited"
     assert len(movies[2][1].split()) > len(movies[2][2].split())
     assert movies[3][0] == "Hobbit2 2016"
+
+def test_download_from_imdb(monkeypatch):
+    monkeypatch.setattr(requests, 'get', fake_response)
+    movies = get_movies_from_rss('correct')
+    loop = asyncio.get_event_loop()
+    result = loop.run_until_complete(download_movie(movies))
+    assert len(result) == 4
+    assert 'Batman' in result
+    batman_movie = result['Batman']
+    assert batman_movie['title'] == 'Batman'
+    assert batman_movie['rating'] == 7.6
+    assert 'genres' in batman_movie
+    assert len(batman_movie['genres']) == 2
