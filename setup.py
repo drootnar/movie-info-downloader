@@ -6,7 +6,7 @@ def read(fname):
 
 setup(
     name = "movie_info_downloader",
-    version = "0.0.3",
+    version = "0.0.4",
     author = "Kamil Rogalski",
     author_email = "drootnar@gmail.com",
     description = ("A simple package to get info from imdb about newest torrent movies using rss file"),
