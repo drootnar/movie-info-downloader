@@ -41,9 +41,14 @@ def get_movies_from_rss(link):
         raise MovieInfoError('Download rss file failed')
     try:
         channel = etree.fromstring(response.text.encode('utf-8'))[0]
+    except KeyError:
+        raise MovieInfoError('Structure of rss file corrupted')
+    try:
+        raw_titles = [item.findall('title')[0].text for item in channel.findall('item')]
     except IndexError:
         raise MovieInfoError('Structure of rss file corrupted')
-    raw_titles = (item.findall('title')[0].text for item in channel.findall('item'))
+    if not raw_titles:
+        raise MovieInfoError('No movies found in rss file')
     return map(get_title_proposals, raw_titles)
 
 
